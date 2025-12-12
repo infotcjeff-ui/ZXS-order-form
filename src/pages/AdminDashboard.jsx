@@ -17,6 +17,7 @@ function AdminContent() {
   const [newCompany, setNewCompany] = useState('')
   const [editingOrderType, setEditingOrderType] = useState(null)
   const [editingCompany, setEditingCompany] = useState(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const handleAddUser = () => {
     if (newUserEmail && newUserPassword && newUserName) {
@@ -29,14 +30,14 @@ function AdminContent() {
       setNewUserPassword('')
       setNewUserName('')
       alert('用戶新增成功！')
-      window.location.reload()
+      setRefreshKey(prev => prev + 1)
     }
   }
 
   const handleDeleteUser = (userId) => {
     if (window.confirm('確定要刪除此用戶嗎？')) {
       deleteUser(userId)
-      window.location.reload()
+      setRefreshKey(prev => prev + 1)
     }
   }
 
@@ -44,7 +45,7 @@ function AdminContent() {
     if (newOrderType) {
       addOrderType(newOrderType)
       setNewOrderType('')
-      window.location.reload()
+      setRefreshKey(prev => prev + 1)
     }
   }
 
@@ -52,7 +53,7 @@ function AdminContent() {
     if (newCompany) {
       addCompany(newCompany)
       setNewCompany('')
-      window.location.reload()
+      setRefreshKey(prev => prev + 1)
     }
   }
 
@@ -129,7 +130,7 @@ function AdminContent() {
             </div>
 
             <h2>用戶列表</h2>
-            <div className="users-list">
+            <div className="users-list" key={refreshKey}>
               {getUsers().map((u) => (
                 <motion.div
                   key={u.id}
@@ -172,7 +173,7 @@ function AdminContent() {
                   新增
                 </button>
               </div>
-              <div className="field-list">
+              <div className="field-list" key={`orderTypes-${refreshKey}`}>
                 {orderTypes.map((type, index) => (
                   <motion.div
                     key={index}
@@ -204,7 +205,7 @@ function AdminContent() {
                         <button
                           onClick={() => {
                             deleteOrderType(index)
-                            window.location.reload()
+                            setRefreshKey(prev => prev + 1)
                           }}
                           className="delete-button"
                         >
@@ -230,7 +231,7 @@ function AdminContent() {
                   新增
                 </button>
               </div>
-              <div className="field-list">
+              <div className="field-list" key={`companies-${refreshKey}`}>
                 {companies.map((company, index) => (
                   <motion.div
                     key={index}
@@ -246,12 +247,12 @@ function AdminContent() {
                         onChange={(e) => updateCompany(index, e.target.value)}
                         onBlur={() => {
                           setEditingCompany(null)
-                          window.location.reload()
+                          setRefreshKey(prev => prev + 1)
                         }}
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
                             setEditingCompany(null)
-                            window.location.reload()
+                            setRefreshKey(prev => prev + 1)
                           }
                         }}
                         autoFocus
@@ -262,7 +263,7 @@ function AdminContent() {
                         <button
                           onClick={() => {
                             deleteCompany(index)
-                            window.location.reload()
+                            setRefreshKey(prev => prev + 1)
                           }}
                           className="delete-button"
                         >
