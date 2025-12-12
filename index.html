@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="/ZXS-order-form/img/ZXS website logo.png" />
     <script type="text/javascript">
       // Single Page Apps for GitHub Pages
-      // Handle 404 redirect before React loads - only once
+      // Handle 404 redirect before React loads
       (function() {
         var l = window.location;
         var search = l.search;
@@ -17,16 +17,11 @@
           var pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&');
           var newPath = '/ZXS-order-form/' + pathname;
           
-          // Clean up all redirect flags
-          Object.keys(sessionStorage).forEach(function(key) {
-            if (key.startsWith('ghp_redirect_') || key.startsWith('redirected_')) {
-              sessionStorage.removeItem(key);
-            }
-          });
-          
-          // Redirect to correct path
+          // Use history.replaceState to avoid page reload and preserve state
           if (l.pathname !== newPath) {
-            l.replace(newPath + l.hash);
+            window.history.replaceState({}, '', newPath + l.hash);
+            // Trigger a popstate event so React Router can handle it
+            window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
           } else {
             // Already on correct path, just clean up the query string
             window.history.replaceState({}, '', newPath + l.hash);

@@ -7,32 +7,38 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load user from localStorage immediately on mount to prevent logout on reload
-    const loadUser = () => {
-      try {
-        const savedUser = localStorage.getItem('user')
-        if (savedUser) {
-          const parsedUser = JSON.parse(savedUser)
-          setUser(parsedUser)
-          setLoading(false) // Set loading to false immediately after setting user
-        } else {
-          setUser(null)
-          setLoading(false)
-        }
-      } catch (e) {
-        console.error('Error loading user from localStorage:', e)
+    // Load user from localStorage SYNCHRONOUSLY on mount to prevent logout on reload
+    // This must happen before any render to prevent blank pages
+    try {
+      const savedUser = localStorage.getItem('user')
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser)
+        setUser(parsedUser)
+      } else {
         setUser(null)
-        setLoading(false)
       }
+    } catch (e) {
+      console.error('Error loading user from localStorage:', e)
+      setUser(null)
+    } finally {
+      setLoading(false)
     }
-    
-    // Load immediately, don't wait
-    loadUser()
     
     // Also listen for storage changes (e.g., from other tabs)
     const handleStorageChange = (e) => {
       if (e.key === 'user') {
-        loadUser()
+        try {
+          const savedUser = localStorage.getItem('user')
+          if (savedUser) {
+            const parsedUser = JSON.parse(savedUser)
+            setUser(parsedUser)
+          } else {
+            setUser(null)
+          }
+        } catch (err) {
+          console.error('Error loading user from localStorage:', err)
+          setUser(null)
+        }
       }
     }
     

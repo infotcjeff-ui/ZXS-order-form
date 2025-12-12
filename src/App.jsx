@@ -11,27 +11,20 @@ function AppRoutes() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Handle GitHub Pages 404 redirect without page reload - only once
+  // Handle GitHub Pages 404 redirect - clean up URL if needed
   useEffect(() => {
     const search = window.location.search
     if (search.includes('?/')) {
       const pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&')
       const newPath = pathname
       
-      // Clean up all redirect flags
-      Object.keys(sessionStorage).forEach(key => {
-        if (key.startsWith('ghp_redirect_') || key.startsWith('redirected_')) {
-          sessionStorage.removeItem(key)
-        }
-      })
-      
-      // Use React Router navigate instead of window.location to avoid reload
+      // Clean up URL by removing the ?/ part
       if (pathname && location.pathname !== newPath) {
         navigate(newPath + window.location.hash, { replace: true })
+      } else if (search.includes('?/')) {
+        // Just clean up the query string
+        window.history.replaceState({}, '', window.location.pathname + window.location.hash)
       }
-      
-      // Clean up URL by removing the ?/ part immediately
-      window.history.replaceState({}, '', window.location.pathname + window.location.hash)
     }
   }, [navigate, location])
 

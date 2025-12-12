@@ -6,27 +6,20 @@
     <link rel="icon" type="image/png" href="/ZXS-order-form/img/ZXS website logo.png" />
     <script>
       // Single Page Apps for GitHub Pages
-      // https://github.com/rafgraph/spa-github-pages
+      // Redirect to index.html with path as query parameter
       (function() {
-        // Prevent infinite loop
-        var redirectKey = 'ghp_redirect_' + window.location.pathname;
-        if (sessionStorage.getItem(redirectKey)) {
-          sessionStorage.removeItem(redirectKey);
-          return;
-        }
-        
         var pathSegmentsToKeep = 2; // Keep /ZXS-order-form/
         var l = window.location;
         var pathname = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/');
         
         if (pathname) {
-          sessionStorage.setItem(redirectKey, 'true');
-          l.replace(
-            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            '/ZXS-order-form/?/' + pathname.replace(/&/g, '~and~') +
+          var redirectUrl = '/ZXS-order-form/?/' + pathname.replace(/&/g, '~and~') + 
             (l.search && !l.search.includes('?/') ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-            l.hash
-          );
+            l.hash;
+          l.replace(redirectUrl);
+        } else {
+          // If no pathname, redirect to root
+          l.replace('/ZXS-order-form/');
         }
       })();
     </script>
