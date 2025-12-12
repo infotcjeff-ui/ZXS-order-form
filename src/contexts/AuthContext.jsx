@@ -42,14 +42,13 @@ export function AuthProvider({ children }) {
     }
   }, [])
   
-  // Continuously sync user state with localStorage to prevent logout on reload
+  // Sync user state with localStorage when user state changes or on focus
   useEffect(() => {
-    const interval = setInterval(() => {
+    const handleFocus = () => {
       const savedUser = localStorage.getItem('user')
       if (savedUser) {
         try {
           const parsedUser = JSON.parse(savedUser)
-          // Only update if different to avoid infinite loops
           if (JSON.stringify(parsedUser) !== JSON.stringify(user)) {
             setUser(parsedUser)
           }
@@ -60,9 +59,19 @@ export function AuthProvider({ children }) {
         // localStorage was cleared, clear user state
         setUser(null)
       }
-    }, 100) // Check every 100ms
+    }
     
-    return () => clearInterval(interval)
+    // Check on window focus (e.g., when user returns to tab)
+    window.addEventListener('focus', handleFocus)
+    
+    // Also check if user is null but localStorage has user (e.g., after reload)
+    if (!user) {
+      handleFocus()
+    }
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+    }
   }, [user])
 
   const login = (email, password) => {
