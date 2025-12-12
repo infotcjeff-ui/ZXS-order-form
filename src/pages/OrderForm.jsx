@@ -50,23 +50,33 @@ function OrderFormContent() {
     let finalOrderType = formData.orderType
     let finalCompany = formData.company
 
-    // Handle "其它" option - add to field list if custom value entered
+    // Handle "其它" option - ONLY add to backend when printing
     if (formData.orderType === '其它') {
-      if (!formData.orderTypeOther) {
+      if (!formData.orderTypeOther || formData.orderTypeOther.trim() === '') {
         alert('請輸入訂單類型')
         return
       }
-      addOrderType(formData.orderTypeOther)
-      finalOrderType = formData.orderTypeOther
+      // Add to backend only when printing
+      const trimmedValue = formData.orderTypeOther.trim()
+      // Check if value already exists to avoid duplicates
+      if (!orderTypes.includes(trimmedValue)) {
+        addOrderType(trimmedValue)
+      }
+      finalOrderType = trimmedValue
     }
     
     if (formData.company === '其它') {
-      if (!formData.companyOther) {
+      if (!formData.companyOther || formData.companyOther.trim() === '') {
         alert('請輸入公司名稱')
         return
       }
-      addCompany(formData.companyOther)
-      finalCompany = formData.companyOther
+      // Add to backend only when printing
+      const trimmedValue = formData.companyOther.trim()
+      // Check if value already exists to avoid duplicates
+      if (!companies.includes(trimmedValue)) {
+        addCompany(trimmedValue)
+      }
+      finalCompany = trimmedValue
     }
 
     if (!finalOrderType || !finalCompany || !formData.customerName) {
