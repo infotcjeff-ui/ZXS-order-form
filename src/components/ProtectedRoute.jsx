@@ -1,13 +1,11 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-
-import { Navigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 import { useEffect, useState } from 'react'
 
 function ProtectedRoute({ children, requiredRole }) {
   const { user, loading } = useAuth()
   const [isChecking, setIsChecking] = useState(true)
+  const [localUser, setLocalUser] = useState(null)
 
   // Always check localStorage first to prevent logout on reload
   useEffect(() => {
@@ -15,22 +13,27 @@ function ProtectedRoute({ children, requiredRole }) {
       try {
         const savedUser = localStorage.getItem('user')
         if (savedUser) {
-          // User exists in localStorage, allow access
-          setIsChecking(false)
-        } else if (!user && !loading) {
-          // No user in localStorage and not loading, redirect to login
-          setIsChecking(false)
+          const parsedUser = JSON.parse(savedUser)
+          setLocalUser(parsedUser)
         } else {
-          setIsChecking(false)
+          setLocalUser(null)
         }
       } catch (e) {
         console.error('Error checking auth:', e)
+        setLocalUser(null)
+      } finally {
         setIsChecking(false)
       }
     }
     
+    // Check immediately
     checkAuth()
-  }, [user, loading])
+    
+    // Also check periodically to catch changes
+    const interval = setInterval(checkAuth, 100)
+    
+    return () => clearInterval(interval)
+  }, [])
 
   if (loading || isChecking) {
     return (
@@ -48,23 +51,14 @@ function ProtectedRoute({ children, requiredRole }) {
     )
   }
 
-  // Check localStorage directly to prevent logout on navigation/reload
-  const savedUser = localStorage.getItem('user')
-  if (!savedUser && !user) {
+  // Use localUser from localStorage if user from context is not available (e.g., on reload)
+  const currentUser = user || localUser
+
+  if (!currentUser) {
     return <Navigate to="/login" replace />
   }
 
-  // Parse user if not in state but exists in localStorage
-  let currentUser = user
-  if (!currentUser && savedUser) {
-    try {
-      currentUser = JSON.parse(savedUser)
-    } catch (e) {
-      return <Navigate to="/login" replace />
-    }
-  }
-
-  if (requiredRole && currentUser && currentUser.role !== requiredRole) {
+  if (requiredRole && currentUser.role !== requiredRole) {
     return <Navigate to="/order" replace />
   }
 

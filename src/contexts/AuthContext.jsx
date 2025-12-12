@@ -7,7 +7,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load user from localStorage on mount and on every render to prevent logout on reload
+    // Load user from localStorage immediately on mount to prevent logout on reload
     const loadUser = () => {
       try {
         const savedUser = localStorage.getItem('user')
@@ -25,6 +25,7 @@ export function AuthProvider({ children }) {
       }
     }
     
+    // Load immediately, don't wait
     loadUser()
     
     // Also listen for storage changes (e.g., from other tabs)
@@ -41,17 +42,27 @@ export function AuthProvider({ children }) {
     }
   }, [])
   
-  // Sync user state with localStorage on every render to prevent logout on reload
+  // Continuously sync user state with localStorage to prevent logout on reload
   useEffect(() => {
-    const savedUser = localStorage.getItem('user')
-    if (savedUser && !user) {
-      try {
-        const parsedUser = JSON.parse(savedUser)
-        setUser(parsedUser)
-      } catch (e) {
-        console.error('Error syncing user from localStorage:', e)
+    const interval = setInterval(() => {
+      const savedUser = localStorage.getItem('user')
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser)
+          // Only update if different to avoid infinite loops
+          if (JSON.stringify(parsedUser) !== JSON.stringify(user)) {
+            setUser(parsedUser)
+          }
+        } catch (e) {
+          console.error('Error syncing user from localStorage:', e)
+        }
+      } else if (user) {
+        // localStorage was cleared, clear user state
+        setUser(null)
       }
-    }
+    }, 100) // Check every 100ms
+    
+    return () => clearInterval(interval)
   }, [user])
 
   const login = (email, password) => {
