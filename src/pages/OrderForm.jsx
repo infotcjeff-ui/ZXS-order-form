@@ -135,6 +135,10 @@ function OrderFormContent() {
     printWindow.focus()
     setTimeout(() => {
       printWindow.print()
+      // Refresh page after printing
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     }, 250)
   }
 
