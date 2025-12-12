@@ -309,10 +309,14 @@ function OrderFormContent() {
           <div className="form-group">
             <label htmlFor="signature">簽署位置</label>
             <div className="signature-box">
-              <div className="signature-label">簽名：</div>
-              <div className="signature-line"></div>
-              <div className="signature-label">日期：</div>
-              <div className="signature-line"></div>
+              <div className="signature-column">
+                <div className="signature-label">簽名：</div>
+                <div className="signature-line"></div>
+              </div>
+              <div className="signature-column">
+                <div className="signature-label">日期：</div>
+                <div className="signature-line"></div>
+              </div>
             </div>
           </div>
 
