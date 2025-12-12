@@ -4,6 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>中信方案 - 訂單表單系統</title>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // Handle 404 redirect before React loads
+      (function() {
+        var pathSegmentsToKeep = 2; // Keep /ZXS-order-form/
+        var l = window.location;
+        var path = l.pathname.split('/').filter(function(p) { return p.length > 0; });
+        
+        // Only redirect if we're on a 404 page (has ?/ in search)
+        if (l.search.includes('?/')) {
+          var pathname = l.search.split('?/')[1].split('&')[0].replace(/~and~/g, '&');
+          var newPath = '/ZXS-order-form/' + pathname;
+          l.replace(newPath + l.hash);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

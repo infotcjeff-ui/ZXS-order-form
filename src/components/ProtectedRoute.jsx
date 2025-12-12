@@ -26,13 +26,8 @@ function ProtectedRoute({ children, requiredRole }) {
       }
     }
     
-    // Check immediately
+    // Check immediately - don't wait
     checkAuth()
-    
-    // Also check periodically to catch changes
-    const interval = setInterval(checkAuth, 100)
-    
-    return () => clearInterval(interval)
   }, [])
 
   if (loading || isChecking) {

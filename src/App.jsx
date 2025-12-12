@@ -7,22 +7,28 @@ import OrderForm from './pages/OrderForm'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function AppRoutes() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   // Handle GitHub Pages 404 redirect without page reload
   useEffect(() => {
+    // Wait for auth to finish loading before handling redirect
+    if (loading) return
+    
     const search = window.location.search
     if (search.includes('?/')) {
       const pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&')
       const newPath = pathname
       // Use React Router navigate instead of window.location to avoid reload
       if (pathname && location.pathname !== newPath) {
+        // Clear the query string after navigation
         navigate(newPath + window.location.hash, { replace: true })
+        // Clean up URL by removing the ?/ part
+        window.history.replaceState({}, '', window.location.pathname + window.location.hash)
       }
     }
-  }, [navigate, location])
+  }, [navigate, location, loading])
 
   return (
     <Routes>
