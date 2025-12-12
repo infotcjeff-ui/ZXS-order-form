@@ -10,6 +10,13 @@ function AdminContent() {
   const { orderTypes, companies, addOrderType, deleteOrderType, updateOrderType, addCompany, deleteCompany, updateCompany } = useFields()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('users')
+  
+  // Debug: Log when fields section is rendered
+  useEffect(() => {
+    if (activeTab === 'fields') {
+      console.log('Fields section active, orderTypes:', orderTypes, 'companies:', companies)
+    }
+  }, [activeTab, orderTypes, companies])
   const [newUserEmail, setNewUserEmail] = useState('')
   const [newUserPassword, setNewUserPassword] = useState('')
   const [newUserName, setNewUserName] = useState('')
