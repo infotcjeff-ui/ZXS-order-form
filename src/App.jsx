@@ -16,7 +16,10 @@ function AppRoutes() {
       const pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&')
       const newPath = '/ZXS-order-form/' + pathname
       window.history.replaceState({}, '', newPath + window.location.hash)
-      window.location.reload()
+      // Use navigate instead of reload to preserve auth state
+      if (pathname) {
+        window.location.href = newPath + window.location.hash
+      }
     }
   }, [])
 
