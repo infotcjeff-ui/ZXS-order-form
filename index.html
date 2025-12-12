@@ -14,26 +14,22 @@
         
         // Only redirect if we're on a 404 page (has ?/ in search)
         if (search.includes('?/')) {
-          // Check if we've already processed this redirect
-          var redirectKey = 'redirected_' + search;
-          if (sessionStorage.getItem(redirectKey)) {
-            // Already processed, clear the flag and let React handle it
-            sessionStorage.removeItem(redirectKey);
-            return;
-          }
-          
           var pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&');
           var newPath = '/ZXS-order-form/' + pathname;
           
-          // Mark as redirected to prevent loop
-          sessionStorage.setItem(redirectKey, 'true');
+          // Clean up all redirect flags
+          Object.keys(sessionStorage).forEach(function(key) {
+            if (key.startsWith('ghp_redirect_') || key.startsWith('redirected_')) {
+              sessionStorage.removeItem(key);
+            }
+          });
           
-          // Redirect without reload to preserve state
+          // Redirect to correct path
           if (l.pathname !== newPath) {
             l.replace(newPath + l.hash);
           } else {
             // Already on correct path, just clean up the query string
-            l.replace(newPath + l.hash);
+            window.history.replaceState({}, '', newPath + l.hash);
           }
         }
       })();
