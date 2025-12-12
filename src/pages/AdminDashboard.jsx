@@ -189,12 +189,12 @@ function AdminContent() {
                         onChange={(e) => updateOrderType(index, e.target.value)}
                         onBlur={() => {
                           setEditingOrderType(null)
-                          window.location.reload()
+                          setRefreshKey(prev => prev + 1)
                         }}
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
                             setEditingOrderType(null)
-                            window.location.reload()
+                            setRefreshKey(prev => prev + 1)
                           }
                         }}
                         autoFocus
