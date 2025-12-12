@@ -20,11 +20,23 @@ function ProtectedRoute({ children, requiredRole }) {
     )
   }
 
-  if (!user) {
+  // Check localStorage directly to prevent logout on navigation
+  const savedUser = localStorage.getItem('user')
+  if (!savedUser && !user) {
     return <Navigate to="/login" replace />
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  // Parse user if not in state but exists in localStorage
+  let currentUser = user
+  if (!currentUser && savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser)
+    } catch (e) {
+      return <Navigate to="/login" replace />
+    }
+  }
+
+  if (requiredRole && currentUser && currentUser.role !== requiredRole) {
     return <Navigate to="/order" replace />
   }
 
@@ -32,4 +44,5 @@ function ProtectedRoute({ children, requiredRole }) {
 }
 
 export default ProtectedRoute
+
 

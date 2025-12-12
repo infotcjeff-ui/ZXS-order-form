@@ -181,7 +181,7 @@ function AdminContent() {
                   新增
                 </button>
               </div>
-              <div className="field-list" key={`orderTypes-${refreshKey}`}>
+              <div className="field-list">
                 {orderTypes.map((type, index) => (
                   <motion.div
                     key={index}
