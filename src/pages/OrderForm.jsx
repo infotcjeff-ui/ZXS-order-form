@@ -267,27 +267,34 @@ function OrderFormContent() {
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="terms">
-                條款/注意事項 <span className="required">*</span>
-                <small className="terms-note">（請仔細閱讀）</small>
-              </label>
-              <div className="terms-content">
-                {getTermsAndConditions().split('\n').map((line, i) => (
-                  <div key={i} className="terms-line">{line}</div>
-                ))}
+          <div className="form-group">
+            <label htmlFor="terms">
+              條款/注意事項 <span className="required">*</span>
+              <small className="terms-note">（請仔細閱讀）</small>
+            </label>
+            <div className="terms-content">
+              <div className="terms-columns">
+                <div className="terms-column-left">
+                  {getTermsAndConditions().split('\n').slice(0, 2).map((line, i) => (
+                    <div key={i} className="terms-line">{line}</div>
+                  ))}
+                </div>
+                <div className="terms-column-right">
+                  {getTermsAndConditions().split('\n').slice(2).map((line, i) => (
+                    <div key={i + 2} className="terms-line">{line}</div>
+                  ))}
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="form-group">
-              <label htmlFor="signature">簽署位置</label>
-              <div className="signature-box">
+          <div className="form-group">
+            <label htmlFor="signature">簽署位置</label>
+            <div className="signature-box">
               <div className="signature-label">簽名：</div>
-                <div className="signature-line"></div>
-                <div className="signature-label">日期：</div>
-                <div className="signature-line"></div>
-              </div>
+              <div className="signature-line"></div>
+              <div className="signature-label">日期：</div>
+              <div className="signature-line"></div>
             </div>
           </div>
 

@@ -196,8 +196,6 @@
 }
 
 .terms-content {
-  max-height: 300px;
-  overflow-y: auto;
   padding: 15px;
   background: #f8f9fa;
   border-radius: 8px;
@@ -205,6 +203,18 @@
   font-size: 12px;
   line-height: 1.8;
   color: #555;
+}
+
+.terms-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.terms-column-left,
+.terms-column-right {
+  display: flex;
+  flex-direction: column;
 }
 
 .terms-line {
