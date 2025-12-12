@@ -49,35 +49,44 @@ export function AuthProvider({ children }) {
     }
   }, [])
   
-  // Sync user state with localStorage when user state changes or on focus
+  // Continuously sync user state with localStorage to prevent logout on reload
   useEffect(() => {
-    const handleFocus = () => {
-      const savedUser = localStorage.getItem('user')
-      if (savedUser) {
-        try {
+    const syncUser = () => {
+      try {
+        const savedUser = localStorage.getItem('user')
+        if (savedUser) {
           const parsedUser = JSON.parse(savedUser)
-          if (JSON.stringify(parsedUser) !== JSON.stringify(user)) {
+          // Always sync if different or if user is null
+          if (!user || JSON.stringify(parsedUser) !== JSON.stringify(user)) {
             setUser(parsedUser)
           }
-        } catch (e) {
-          console.error('Error syncing user from localStorage:', e)
+        } else if (user) {
+          // localStorage was cleared, but don't clear user immediately
+          // Wait a bit in case it's just a timing issue
+          setTimeout(() => {
+            const checkAgain = localStorage.getItem('user')
+            if (!checkAgain) {
+              setUser(null)
+            }
+          }, 100)
         }
-      } else if (user) {
-        // localStorage was cleared, clear user state
-        setUser(null)
+      } catch (e) {
+        console.error('Error syncing user from localStorage:', e)
       }
     }
     
-    // Check on window focus (e.g., when user returns to tab)
-    window.addEventListener('focus', handleFocus)
+    // Sync immediately
+    syncUser()
     
-    // Also check if user is null but localStorage has user (e.g., after reload)
-    if (!user) {
-      handleFocus()
-    }
+    // Check on window focus
+    window.addEventListener('focus', syncUser)
+    
+    // Also check periodically (but not too often)
+    const interval = setInterval(syncUser, 500)
     
     return () => {
-      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('focus', syncUser)
+      clearInterval(interval)
     }
   }, [user])
 

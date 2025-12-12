@@ -7,9 +7,26 @@ function ProtectedRoute({ children, requiredRole }) {
   const [isChecking, setIsChecking] = useState(true)
   const [localUser, setLocalUser] = useState(null)
 
-  // Always check localStorage first to prevent logout on reload
+  // Always check localStorage SYNCHRONOUSLY first to prevent logout on reload
   useEffect(() => {
-    const checkAuth = () => {
+    // Check immediately and synchronously
+    try {
+      const savedUser = localStorage.getItem('user')
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser)
+        setLocalUser(parsedUser)
+      } else {
+        setLocalUser(null)
+      }
+    } catch (e) {
+      console.error('Error checking auth:', e)
+      setLocalUser(null)
+    } finally {
+      setIsChecking(false)
+    }
+    
+    // Also check on focus to catch any changes
+    const handleFocus = () => {
       try {
         const savedUser = localStorage.getItem('user')
         if (savedUser) {
@@ -19,19 +36,8 @@ function ProtectedRoute({ children, requiredRole }) {
           setLocalUser(null)
         }
       } catch (e) {
-        console.error('Error checking auth:', e)
-        setLocalUser(null)
-      } finally {
-        setIsChecking(false)
+        console.error('Error checking auth on focus:', e)
       }
-    }
-    
-    // Check immediately - don't wait
-    checkAuth()
-    
-    // Also check on focus to catch any changes
-    const handleFocus = () => {
-      checkAuth()
     }
     window.addEventListener('focus', handleFocus)
     
