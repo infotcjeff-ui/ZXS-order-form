@@ -30,7 +30,7 @@
   padding: 40px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
-  max-width: 450px;
+  max-width: 1200px;
   position: relative;
   z-index: 1;
 }
@@ -41,7 +41,7 @@
   margin-bottom: 30px;
 }
 
-.logo {
+.zxs-logo {
   max-width: 200px;
   height: auto;
 }
@@ -175,6 +175,49 @@
 }
 
 .login-button:hover {
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.direct-access-section {
+  margin-top: 20px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #999;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.divider span {
+  padding: 0 15px;
+  font-size: 14px;
+}
+
+.direct-access-button {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.direct-access-button:hover {
+  background: #667eea;
+  color: white;
   box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 

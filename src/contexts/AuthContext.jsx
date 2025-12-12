@@ -38,10 +38,22 @@ export function AuthProvider({ children }) {
       delete userData.password
       setUser(userData)
       localStorage.setItem('user', JSON.stringify(userData))
-      return { success: true }
+      return { success: true, user: userData }
     }
     
     return { success: false, error: '帳號或密碼錯誤' }
+  }
+
+  const directAccess = () => {
+    const staffUser = {
+      id: 'staff',
+      email: '',
+      role: 'staff',
+      name: '員工'
+    }
+    setUser(staffUser)
+    localStorage.setItem('user', JSON.stringify(staffUser))
+    return { success: true, user: staffUser }
   }
 
   const logout = () => {
@@ -82,6 +94,7 @@ export function AuthProvider({ children }) {
     addUser,
     deleteUser,
     getUsers,
+    directAccess,
     loading
   }
 

@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import '../styles/Login.css'
-// Logo will be handled via CSS fallback if image doesn't exist
+import zxsLogo from '../img/ZXS logo.png'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { login } = useAuth()
+  const { login, directAccess } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
@@ -19,10 +19,19 @@ function Login() {
     const result = login(email, password)
     
     if (result.success) {
-      navigate(result.user?.role === 'admin' ? '/admin' : '/order')
+      if (result.user?.role === 'staff') {
+        navigate('/order', { state: { directAccess: true } })
+      } else {
+        navigate(result.user?.role === 'admin' ? '/admin' : '/order')
+      }
     } else {
       setError(result.error)
     }
+  }
+
+  const handleDirectAccess = () => {
+    directAccess()
+    navigate('/order', { state: { directAccess: true } })
   }
 
   return (
@@ -39,26 +48,7 @@ function Login() {
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
         >
-          <div className="logo-placeholder">
-            <div className="logo-graphic">
-              <div className="logo-z"></div>
-              <div className="logo-x"></div>
-            </div>
-            <div className="logo-text">
-              <div className="logo-chinese">中信方案</div>
-              <div className="logo-english">ZX SOLUTION</div>
-            </div>
-          </div>
-          <div className="logo-placeholder" style={{ display: 'none' }}>
-            <div className="logo-graphic">
-              <div className="logo-z"></div>
-              <div className="logo-x"></div>
-            </div>
-            <div className="logo-text">
-              <div className="logo-chinese">中信方案</div>
-              <div className="logo-english">ZX SOLUTION</div>
-            </div>
-          </div>
+          <img src={zxsLogo} alt="ZXS Logo" className="zxs-logo" />
         </motion.div>
 
         <motion.h1
@@ -85,7 +75,7 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="admin@jeff.zxs.hk"
+              placeholder="example@zxs.hk"
             />
           </div>
 
@@ -120,6 +110,26 @@ function Login() {
             登入
           </motion.button>
         </motion.form>
+
+        <motion.div
+          className="direct-access-section"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <div className="divider">
+            <span>或</span>
+          </div>
+          <motion.button
+            type="button"
+            onClick={handleDirectAccess}
+            className="direct-access-button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            員工直接進入
+          </motion.button>
+        </motion.div>
       </motion.div>
     </div>
   )

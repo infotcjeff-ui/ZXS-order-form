@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { FieldProvider, useFields } from '../contexts/FieldContext'
-import { downloadPDF, downloadWord, downloadJPG } from '../utils/downloadUtils'
 import '../styles/OrderForm.css'
-// Logo will be handled via CSS fallback if image doesn't exist
+import zxsLogo from '../img/ZXS logo.png'
+import zxsWebsiteLogo from '../img/ZXS website logo.png'
 
 function OrderFormContent() {
   const { user, logout } = useAuth()
-  const { orderTypes, companies } = useFields()
+  const { orderTypes, companies, addOrderType, addCompany } = useFields()
   const navigate = useNavigate()
+  const location = useLocation()
+  const directAccess = location.state?.directAccess || user?.role === 'staff'
   
   const [formData, setFormData] = useState({
     orderType: '',
+    orderTypeOther: '',
     company: '',
+    companyOther: '',
     customerName: '',
     phone: '',
     email: '',
-    address: '',
     notes: ''
   })
 
@@ -27,68 +30,123 @@ function OrderFormContent() {
   })
 
   const handleChange = (e) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
   }
 
-  const handleDownload = async (format) => {
-    if (!formData.orderType || !formData.company || !formData.customerName) {
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: value,
+      [`${name}Other`]: '' // Clear other input when selecting different option
+    })
+  }
+
+  const handlePrint = () => {
+    let finalOrderType = formData.orderType
+    let finalCompany = formData.company
+
+    // Handle "其它" option - add to field list if custom value entered
+    if (formData.orderType === '其它') {
+      if (!formData.orderTypeOther) {
+        alert('請輸入訂單類型')
+        return
+      }
+      addOrderType(formData.orderTypeOther)
+      finalOrderType = formData.orderTypeOther
+    }
+    
+    if (formData.company === '其它') {
+      if (!formData.companyOther) {
+        alert('請輸入公司名稱')
+        return
+      }
+      addCompany(formData.companyOther)
+      finalCompany = formData.companyOther
+    }
+
+    if (!finalOrderType || !finalCompany || !formData.customerName) {
       alert('請填寫必填欄位（訂單類型、所屬公司、客戶姓名）')
       return
     }
 
-    try {
-      switch (format) {
-        case 'pdf':
-          await downloadPDF(formData, orderId)
-          break
-        case 'word':
-          await downloadWord(formData, orderId)
-          break
-        case 'jpg':
-          await downloadJPG(formData, orderId)
-          break
-        default:
-          alert('不支援的格式')
-      }
-    } catch (error) {
-      console.error('下載失敗:', error)
-      alert('下載失敗，請稍後再試')
+    // Update the print form with final values
+    const printContent = document.getElementById('order-form-print')
+    const orderTypeField = printContent.querySelector('.print-field:first-of-type')
+    const companyField = orderTypeField?.nextElementSibling
+    
+    if (orderTypeField) {
+      orderTypeField.innerHTML = `<strong>訂單類型:</strong> ${finalOrderType}`
     }
+    if (companyField) {
+      companyField.innerHTML = `<strong>所屬公司:</strong> ${finalCompany}`
+    }
+
+    const printWindow = window.open('', '_blank')
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>訂單表單</title>
+          <style>
+            @page { size: A4; margin: 15mm; }
+            body { font-family: Arial, sans-serif; }
+            .print-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+            .print-logo img { max-width: 100px; height: auto; }
+            .print-company-info { text-align: right; font-size: 11px; line-height: 1.5; }
+            h1 { text-align: center; font-size: 24px; margin: 10px 0; }
+            .print-subtitle { text-align: center; font-size: 12px; color: #666; margin-bottom: 15px; }
+            .print-content { margin-top: 15px; }
+            .print-section { margin-bottom: 15px; }
+            .print-section h2 { font-size: 16px; margin-bottom: 10px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 5px; }
+            .print-field { margin-bottom: 8px; font-size: 13px; line-height: 1.6; }
+            .print-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+            .print-terms { font-size: 10px; line-height: 1.6; color: #555; }
+            .print-terms div { margin-bottom: 6px; }
+            .print-signature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+            .print-signature-col { display: flex; flex-direction: column; }
+            .print-signature-label { font-size: 12px; margin-bottom: 10px; color: #666; }
+            .print-signature-row div[style*="border"] { border-bottom: 1px solid #333 !important; border-top: 0px !important; min-height: 40px; padding-bottom: 10px; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.focus()
+    setTimeout(() => {
+      printWindow.print()
+    }, 250)
   }
 
   return (
     <div className="order-form-container">
-      <motion.div
-        className="order-form-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="header-logo">
-          <div className="logo-placeholder">
-            <div className="logo-graphic">
-              <div className="logo-z"></div>
-              <div className="logo-x"></div>
-            </div>
-            <div className="logo-text">
-              <div className="logo-chinese">中信方案</div>
-              <div className="logo-english">ZX SOLUTION</div>
-            </div>
+      {!directAccess && (
+        <motion.div
+          className="order-form-header"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="header-logo">
+            <img src={zxsLogo} alt="ZXS Logo" className="zxs-logo" />
           </div>
-        </div>
-        <div className="header-actions">
-          {user?.role === 'admin' && (
-            <button onClick={() => navigate('/admin')} className="admin-button">
-              管理後台
+          <div className="header-actions">
+            {user?.role === 'admin' && (
+              <button onClick={() => navigate('/admin')} className="admin-button">
+                管理後台
+              </button>
+            )}
+            <button onClick={() => { logout(); navigate('/login') }} className="logout-button">
+              登出
             </button>
-          )}
-          <button onClick={() => { logout(); navigate('/login') }} className="logout-button">
-            登出
-          </button>
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      )}
 
       <motion.div
         className="order-form-card"
@@ -107,14 +165,26 @@ function OrderFormContent() {
                 id="orderType"
                 name="orderType"
                 value={formData.orderType}
-                onChange={handleChange}
+                onChange={handleSelectChange}
                 required
               >
                 <option value="">請選擇</option>
                 {orderTypes.map((type, index) => (
                   <option key={index} value={type}>{type}</option>
                 ))}
+                <option value="其它">其它</option>
               </select>
+              {formData.orderType === '其它' && (
+                <input
+                  type="text"
+                  name="orderTypeOther"
+                  value={formData.orderTypeOther}
+                  onChange={handleChange}
+                  placeholder="請輸入訂單類型"
+                  className="other-input"
+                  required
+                />
+              )}
             </div>
 
             <div className="form-group">
@@ -123,14 +193,26 @@ function OrderFormContent() {
                 id="company"
                 name="company"
                 value={formData.company}
-                onChange={handleChange}
+                onChange={handleSelectChange}
                 required
               >
                 <option value="">請選擇</option>
                 {companies.map((company, index) => (
                   <option key={index} value={company}>{company}</option>
                 ))}
+                <option value="其它">其它</option>
               </select>
+              {formData.company === '其它' && (
+                <input
+                  type="text"
+                  name="companyOther"
+                  value={formData.companyOther}
+                  onChange={handleChange}
+                  placeholder="請輸入公司名稱"
+                  className="other-input"
+                  required
+                />
+              )}
             </div>
           </div>
 
@@ -174,18 +256,6 @@ function OrderFormContent() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="address">送貨地址</label>
-            <textarea
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows="3"
-              placeholder="請輸入完整送貨地址"
-            />
-          </div>
-
-          <div className="form-group">
             <label htmlFor="notes">備註</label>
             <textarea
               id="notes"
@@ -197,58 +267,55 @@ function OrderFormContent() {
             />
           </div>
 
-          <div className="download-buttons">
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="terms">
+                條款/注意事項 <span className="required">*</span>
+                <small className="terms-note">（請仔細閱讀）</small>
+              </label>
+              <div className="terms-content">
+                {getTermsAndConditions().split('\n').map((line, i) => (
+                  <div key={i} className="terms-line">{line}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="signature">簽署位置</label>
+              <div className="signature-box">
+              <div className="signature-label">簽名：</div>
+                <div className="signature-line"></div>
+                <div className="signature-label">日期：</div>
+                <div className="signature-line"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="print-button-container">
             <motion.button
               type="button"
-              onClick={() => handleDownload('pdf')}
-              className="download-btn pdf-btn"
+              onClick={handlePrint}
+              className="print-button"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              📄 下載 PDF
-            </motion.button>
-            <motion.button
-              type="button"
-              onClick={() => handleDownload('word')}
-              className="download-btn word-btn"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              📝 下載 Word
-            </motion.button>
-            <motion.button
-              type="button"
-              onClick={() => handleDownload('jpg')}
-              className="download-btn jpg-btn"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              🖼️ 下載 JPG
+              🖨️ 列印訂單表單
             </motion.button>
           </div>
         </form>
 
-        {/* Hidden form for JPG generation */}
+        {/* Hidden form for printing */}
         <div id="order-form-print" className="print-form" style={{ display: 'none' }}>
           <div className="print-header">
             <div className="print-logo">
-              <div className="logo-placeholder">
-                <div className="logo-graphic">
-                  <div className="logo-z"></div>
-                  <div className="logo-x"></div>
-                </div>
-                <div className="logo-text">
-                  <div className="logo-chinese">中信方案</div>
-                  <div className="logo-english">ZX SOLUTION</div>
-                </div>
-              </div>
+              <img src={zxsWebsiteLogo} alt="ZXS Website Logo" style={{ maxWidth: '100px', height: 'auto' }} />
             </div>
             <div className="print-company-info">
               <div><strong>中信方案有限公司</strong></div>
-              <div>123 Maple Street Anytown, PA 17101</div>
-              <div>info@example.com</div>
-              <div>www.example.com</div>
-              <div>(123) 1234567</div>
+              <div>元朗八鄉粉錦公路8號 (八鄉警署旁)</div>
+              <div>info@zxs.hk</div>
+              <div>https://zxs.hk/</div>
+              <div>9328 9880</div>
             </div>
           </div>
           <h1>訂單表單</h1>
@@ -257,10 +324,10 @@ function OrderFormContent() {
             <div className="print-section">
               <h2>訂單詳情</h2>
               <div className="print-field">
-                <strong>訂單類型:</strong> {formData.orderType || '無'}
+                <strong>訂單類型:</strong> {formData.orderType === '其它' ? (formData.orderTypeOther || '無') : (formData.orderType || '無')}
               </div>
               <div className="print-field">
-                <strong>所屬公司:</strong> {formData.company || '無'}
+                <strong>所屬公司:</strong> {formData.company === '其它' ? (formData.companyOther || '無') : (formData.company || '無')}
               </div>
               <div className="print-field">
                 <strong>客戶姓名:</strong> {formData.customerName || '無'}
@@ -271,19 +338,31 @@ function OrderFormContent() {
               <div className="print-field">
                 <strong>電子郵件:</strong> {formData.email || '無'}
               </div>
-              <div className="print-field">
-                <strong>送貨地址:</strong> {formData.address || '無'}
+            </div>
+            <div className="print-row">
+              <div className="print-section">
+                <h2>條款/注意事項 <span style={{ fontSize: '10px', color: '#e74c3c' }}>*</span></h2>
+                <div className="print-terms">
+                  {getTermsAndConditions().split('\n').map((line, i) => (
+                    <div key={i}>{line}</div>
+                  ))}
+                </div>
               </div>
-              <div className="print-field">
-                <strong>備註:</strong> {formData.notes || '無'}
+              <div className="print-section">
+                <h2>備註</h2>
+                <div className="print-field">
+                  {formData.notes || '無'}
+                </div>
               </div>
             </div>
-            <div className="print-section">
-              <h2>條款細則</h2>
-              <div className="print-terms">
-                {getTermsAndConditions().split('\n').map((line, i) => (
-                  <div key={i}>{line}</div>
-                ))}
+            <div className="print-signature-row">
+              <div className="print-signature-col">
+                <div className="print-signature-label">簽名：</div>
+                <div style={{ borderTop: '0px', borderBottom: '1px solid #333', paddingBottom: '10px', minHeight: '40px', marginTop: '10px' }}></div>
+              </div>
+              <div className="print-signature-col">
+                <div className="print-signature-label">日期：</div>
+                <div style={{ borderTop: '0px', borderBottom: '1px solid #333', paddingBottom: '10px', minHeight: '40px', marginTop: '10px' }}></div>
               </div>
             </div>
           </div>
@@ -300,31 +379,11 @@ const getTermsAndConditions = () => {
 2. 付款條款
    客戶須於訂單確認後7個工作天內完成付款。如未能在指定期限內付款，本公司保留取消訂單的權利。
 
-3. 送貨安排
-   標準訂單：7-14個工作天
-   急件訂單：3-5個工作天
-   批量訂單：14-21個工作天
-   客製化訂單：視乎具體要求而定
-
-4. 品質保證
-   本公司保證所提供的產品及服務符合相關標準。如發現品質問題，客戶須於收貨後7個工作天內提出，逾期恕不受理。
-
-5. 退換貨政策
-   除非產品有明顯缺陷或與訂單不符，否則不接受退換貨。退換貨申請須於收貨後7個工作天內提出。
-
-6. 責任限制
-   本公司對因不可抗力因素（包括但不限於自然災害、戰爭、罷工等）導致的延誤或損失不承擔責任。
-
-7. 資料保密
+3. 資料保密
    本公司承諾對客戶提供的所有資料嚴格保密，僅用於處理訂單相關事宜。
 
-8. 適用法律
-   本訂單受香港特別行政區法律管轄，任何爭議應提交香港法院解決。
-
-9. 其他條款
-   本公司保留隨時修改本條款細則的權利，修改後的條款將於網站上公布。客戶繼續使用本服務即視為接受修改後的條款。
-
-如有任何疑問，請聯絡本公司客戶服務部。`
+4. 其他條款
+   本公司保留隨時修改本條款細則的權利，修改後的條款將於網站上公布。客戶繼續使用本服務即視為接受修改後的條款。`
 }
 
 function OrderForm() {
