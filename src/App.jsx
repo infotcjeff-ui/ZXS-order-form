@@ -11,12 +11,12 @@ function AppRoutes() {
 
   // Handle GitHub Pages 404 redirect
   useEffect(() => {
-    const path = window.location.pathname
     const search = window.location.search
     if (search.includes('?/')) {
       const pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&')
-      const newPath = path.split('/').slice(0, -1).join('/') + '/' + pathname
+      const newPath = '/ZXS-order-form/' + pathname
       window.history.replaceState({}, '', newPath + window.location.hash)
+      window.location.reload()
     }
   }, [])
 
