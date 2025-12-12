@@ -217,8 +217,21 @@
   flex-direction: column;
 }
 
+.terms-item {
+  margin-bottom: 20px;
+}
+
+.terms-item:last-child {
+  margin-bottom: 0;
+}
+
 .terms-line {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+.terms-line:last-child {
+  margin-bottom: 0;
 }
 
 .signature-box {

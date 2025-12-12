@@ -275,14 +275,28 @@ function OrderFormContent() {
             <div className="terms-content">
               <div className="terms-columns">
                 <div className="terms-column-left">
-                  {getTermsAndConditions().split('\n').slice(0, 2).map((line, i) => (
-                    <div key={i} className="terms-line">{line}</div>
-                  ))}
+                  {getTermsAndConditions()
+                    .split(/\n(?=\d+\.)/)
+                    .slice(0, 2)
+                    .map((term, i) => (
+                      <div key={i} className="terms-item">
+                        {term.split('\n').map((line, j) => (
+                          <div key={j} className="terms-line">{line}</div>
+                        ))}
+                      </div>
+                    ))}
                 </div>
                 <div className="terms-column-right">
-                  {getTermsAndConditions().split('\n').slice(2).map((line, i) => (
-                    <div key={i + 2} className="terms-line">{line}</div>
-                  ))}
+                  {getTermsAndConditions()
+                    .split(/\n(?=\d+\.)/)
+                    .slice(2)
+                    .map((term, i) => (
+                      <div key={i + 2} className="terms-item">
+                        {term.split('\n').map((line, j) => (
+                          <div key={j} className="terms-line">{line}</div>
+                        ))}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
