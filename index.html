@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>中信方案 - 訂單表單系統</title>
+    <link rel="icon" type="image/png" href="/ZXS-order-form/img/ZXS website logo.png" />
+    <style>
+      #redirect-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s ease-out;
+      }
+      #redirect-loading.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .loading-text {
+        color: white;
+        font-size: 18px;
+        font-weight: 500;
+        animation: pulse 1.5s ease-in-out infinite;
+        text-align: center;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+      }
+    </style>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // Handle 404 redirect before React loads
+      (function() {
+        var l = window.location;
+        var search = l.search;
+        
+        // Show loading overlay if redirecting
+        if (search.includes('?/')) {
+          var loadingDiv = document.createElement('div');
+          loadingDiv.id = 'redirect-loading';
+          loadingDiv.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><div class="loading-text">載入中...</div></div>';
+          document.body.appendChild(loadingDiv);
+        }
+        
+        // Only redirect if we're on a 404 page (has ?/ in search)
+        if (search.includes('?/')) {
+          var pathname = search.split('?/')[1].split('&')[0].replace(/~and~/g, '&');
+          var newPath = '/ZXS-order-form/' + pathname;
+          
+          // Use history.replaceState to avoid page reload and preserve state
+          if (l.pathname !== newPath) {
+            window.history.replaceState({}, '', newPath + l.hash);
+            // Trigger a popstate event so React Router can handle it
+            window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+            // Hide loading after React loads
+            setTimeout(function() {
+              var loading = document.getElementById('redirect-loading');
+              if (loading) {
+                loading.classList.add('hidden');
+                setTimeout(function() {
+                  if (loading && loading.parentNode) {
+                    loading.parentNode.removeChild(loading);
+                  }
+                }, 300);
+              }
+            }, 500);
+          } else {
+            // Already on correct path, just clean up the query string
+            window.history.replaceState({}, '', newPath + l.hash);
+            var loading = document.getElementById('redirect-loading');
+            if (loading) {
+              loading.classList.add('hidden');
+              setTimeout(function() {
+                if (loading && loading.parentNode) {
+                  loading.parentNode.removeChild(loading);
+                }
+              }, 300);
+            }
+          }
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/ZXS-order-form/assets/index-BT76GM74.js"></script>
+    <link rel="stylesheet" crossorigin href="/ZXS-order-form/assets/index-VzDY7LOh.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
