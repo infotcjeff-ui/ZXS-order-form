@@ -191,7 +191,7 @@ function OrderFormContent() {
               登出
             </button>
           )}
-          {!user && (
+          {(!user || user?.role === 'staff') && (
             <button onClick={() => navigate('/login', { state: {} })} className="login-button">
               登入
             </button>
