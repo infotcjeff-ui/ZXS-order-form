@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { FieldProvider, useFields } from '../contexts/FieldContext'
 import { SignaturePad } from '../components/SignaturePad'
+import { clearCache } from '../utils/version'
 import '../styles/OrderForm.css'
 import zxsLogo from '../img/ZXS logo.png'
 import zxsWebsiteLogo from '../img/ZXS website logo.png'
@@ -176,6 +177,17 @@ function OrderFormContent() {
           <img src={zxsLogo} alt="ZXS Logo" className="zxs-logo" />
         </div>
         <div className="header-actions">
+          <button 
+            onClick={() => {
+              if (window.confirm('確定要清除網頁快取嗎？這將會重新載入頁面。')) {
+                clearCache()
+              }
+            }} 
+            className="clear-cache-button"
+            title="清除網頁快取"
+          >
+            🗑️ 清除快取
+          </button>
           {user?.role === 'admin' && (
             <button onClick={() => navigate('/admin')} className="admin-button">
               管理後台

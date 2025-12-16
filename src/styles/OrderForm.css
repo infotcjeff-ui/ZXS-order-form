@@ -51,7 +51,8 @@
 
 .admin-button,
 .logout-button,
-.login-button {
+.login-button,
+.clear-cache-button {
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -89,6 +90,17 @@
 }
 
 .login-button:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.clear-cache-button {
+  background: #667eea;
+  color: white;
+}
+
+.clear-cache-button:hover {
   background: #5568d3;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
