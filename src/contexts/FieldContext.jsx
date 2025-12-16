@@ -24,6 +24,33 @@ export function FieldProvider({ children }) {
       .upsert({ name, items }, { onConflict: 'name' })
     if (error) {
       console.error(`Failed to persist ${name} to Supabase`, error)
+      fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'supabase-sync',
+          hypothesisId: 'PERSIST',
+          location: 'FieldContext:persistFieldSet',
+          message: 'Persist failed',
+          data: { name, error: error.message },
+          timestamp: Date.now()
+        })
+      }).catch(() => {})
+    } else {
+      fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'supabase-sync',
+          hypothesisId: 'PERSIST',
+          location: 'FieldContext:persistFieldSet',
+          message: 'Persist success',
+          data: { name, count: Array.isArray(items) ? items.length : null },
+          timestamp: Date.now()
+        })
+      }).catch(() => {})
     }
   }
 
@@ -36,8 +63,34 @@ export function FieldProvider({ children }) {
       .maybeSingle()
     if (error) {
       console.error(`Failed to fetch ${name} from Supabase`, error)
+      fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'supabase-sync',
+          hypothesisId: 'FETCH',
+          location: 'FieldContext:fetchFieldSet',
+          message: 'Fetch failed',
+          data: { name, error: error.message },
+          timestamp: Date.now()
+        })
+      }).catch(() => {})
       return null
     }
+    fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'supabase-sync',
+        hypothesisId: 'FETCH',
+        location: 'FieldContext:fetchFieldSet',
+        message: 'Fetch success',
+        data: { name, count: Array.isArray(data?.items) ? data.items.length : null },
+        timestamp: Date.now()
+      })
+    }).catch(() => {})
     return data?.items || null
   }
 
@@ -112,6 +165,19 @@ export function FieldProvider({ children }) {
           }
         } catch (err) {
           console.error('Error syncing fields with Supabase:', err)
+          fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: 'debug-session',
+              runId: 'supabase-sync',
+              hypothesisId: 'SYNC',
+              location: 'FieldContext:loadFields',
+              message: 'Sync block failed',
+              data: { error: err?.message },
+              timestamp: Date.now()
+            })
+          }).catch(() => {})
         }
       }
     }
