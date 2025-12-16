@@ -512,5 +512,10 @@
   .print-row {
     grid-template-columns: 1fr;
   }
+  
+  .signature-box {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
