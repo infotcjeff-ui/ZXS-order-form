@@ -9,9 +9,12 @@ import ProtectedRoute from './components/ProtectedRoute'
 function RootRedirect() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    if (!loading) {
+    // Only redirect if we're actually on the root path
+    // This prevents redirecting when user navigates to /login directly
+    if (!loading && location.pathname === '/') {
       const savedUser = localStorage.getItem('user')
       if (savedUser) {
         try {
@@ -24,7 +27,7 @@ function RootRedirect() {
         navigate('/login', { replace: true })
       }
     }
-  }, [user, loading, navigate])
+  }, [user, loading, navigate, location])
 
   return null
 }
