@@ -1,6 +1,7 @@
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useEffect, useState } from 'react'
+import '../styles/ProtectedRoute.css'
 
 // Get user from localStorage synchronously
 function getLocalUser() {
@@ -69,8 +70,13 @@ function ProtectedRoute({ children, requiredRole }) {
   if (!currentUser) {
     // Only redirect if we're sure there's no user (not just loading)
     if (!loading) {
-      // Save current location so we can redirect back after login
-      return <Navigate to="/login" state={{ from: location }} replace />
+      // Show page with sticky login button instead of redirecting
+      return (
+        <>
+          {children}
+          <StickyLoginButton location={location} />
+        </>
+      )
     }
     // If still loading, show loading screen instead of redirecting
     return (
@@ -117,6 +123,26 @@ function ProtectedRoute({ children, requiredRole }) {
   }
 
   return children
+}
+
+// Sticky Login Button Component
+function StickyLoginButton({ location }) {
+  const navigate = useNavigate()
+
+  const handleLoginClick = () => {
+    navigate('/login', { state: { from: location } })
+  }
+
+  return (
+    <button
+      className="sticky-login-button"
+      onClick={handleLoginClick}
+      title="點擊返回登入頁面"
+    >
+      <span className="sticky-login-icon">🔐</span>
+      <span className="sticky-login-text">登入</span>
+    </button>
+  )
 }
 
 export default ProtectedRoute

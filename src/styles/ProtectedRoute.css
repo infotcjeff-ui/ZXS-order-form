@@ -1,0 +1,71 @@
+/* Sticky Login Button Styles */
+.sticky-login-button {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 15px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  animation: slideInRight 0.5s ease-out;
+}
+
+.sticky-login-button:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.sticky-login-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.sticky-login-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.sticky-login-text {
+  white-space: nowrap;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sticky-login-button {
+    right: 10px;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .sticky-login-text {
+    display: none;
+  }
+  
+  .sticky-login-icon {
+    font-size: 24px;
+  }
+}
+
