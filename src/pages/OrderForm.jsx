@@ -109,11 +109,11 @@ function OrderFormContent() {
 
     if (printSignatureCol) {
       if (signatureMode === 'draw' && formData.signature) {
-        printSignatureCol.innerHTML = `<img src="${formData.signature}" alt="簽名" style="max-width: 200px; max-height: 80px; border-bottom: 1px solid #333; padding-bottom: 10px;" />`
+        printSignatureCol.innerHTML = `<img src="${formData.signature}" alt="簽名" style="max-width: 200px; max-height: 80px; border-bottom: 1px solid #333; padding-bottom: 10px; border-top: none; border-left: none; border-right: none;" />`
       } else if (signatureMode === 'text' && formData.signatureText) {
-        printSignatureCol.innerHTML = `<div style="font-family: Cursive, '標楷體', sans-serif; border-bottom: 1px solid #333; padding-bottom: 10px; min-height: 40px; margin-top: 10px;">${formData.signatureText}</div>`
+        printSignatureCol.innerHTML = `<div style="font-family: Cursive, '標楷體', sans-serif; border-bottom: 1px solid #333; padding-bottom: 10px; min-height: 40px; margin-top: 10px; border-top: none; border-left: none; border-right: none;">${formData.signatureText}</div>`
       } else {
-        printSignatureCol.innerHTML = `<div style="border-top: 0px; border-bottom: 1px solid #333; padding-bottom: 10px; min-height: 40px; margin-top: 10px;"></div>`
+        printSignatureCol.innerHTML = `<div style="border-bottom: 1px solid #333; padding-bottom: 10px; min-height: 40px; margin-top: 10px; border-top: none; border-left: none; border-right: none;"></div>`
       }
     }
     if (printDateCol) {
@@ -127,7 +127,17 @@ function OrderFormContent() {
           <title>訂單表單</title>
           <style>
             @page { size: A4; margin: 15mm; }
-            body { font-family: Arial, sans-serif; }
+            @media print {
+              body { width: 210mm; min-height: 297mm; }
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              width: 210mm;
+              min-height: 297mm;
+              margin: 0 auto;
+              padding: 15mm;
+              box-sizing: border-box;
+            }
             .print-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
             .print-logo img { max-width: 100px; height: auto; }
             .print-company-info { text-align: right; font-size: 11px; line-height: 1.5; }
@@ -147,7 +157,8 @@ function OrderFormContent() {
             .print-signature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
             .print-signature-col { display: flex; flex-direction: column; }
             .print-signature-label { font-size: 12px; margin-bottom: 10px; color: #666; }
-            .print-signature-row div[style*="border"] { border-bottom: 1px solid #333 !important; border-top: 0px !important; min-height: 40px; padding-bottom: 10px; margin-top: 10px; }
+            .print-signature-row div[style*="border"] { border-bottom: 1px solid #333 !important; border-top: none !important; border-left: none !important; border-right: none !important; min-height: 40px; padding-bottom: 10px; margin-top: 10px; }
+            #print-signature-content { border-bottom: 1px solid #333 !important; border-top: none !important; border-left: none !important; border-right: none !important; }
           </style>
         </head>
         <body>
@@ -504,7 +515,7 @@ function OrderFormContent() {
             <div className="print-signature-row">
               <div className="print-signature-col">
                 <div className="print-signature-label">簽名：</div>
-                <div id="print-signature-content" style={{ borderTop: '0px', paddingBottom: '10px', minHeight: '40px', marginTop: '10px' }}></div>
+                <div id="print-signature-content" style={{ borderBottom: '1px solid #333', borderTop: 'none', borderLeft: 'none', borderRight: 'none', paddingBottom: '10px', minHeight: '40px', marginTop: '10px' }}></div>
               </div>
               <div className="print-signature-col">
                 <div className="print-signature-label">日期：</div>
