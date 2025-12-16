@@ -228,21 +228,21 @@
 }
 
 .clear-cache-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: #667eea;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: none;
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
 }
 
 .clear-cache-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: #5568d3;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 

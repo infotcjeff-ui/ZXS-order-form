@@ -181,18 +181,17 @@ function OrderFormContent() {
               管理後台
             </button>
           )}
-          {user ? (
-            user?.role === 'admin' && (
-              <button onClick={() => { 
-                logout()
-                setTimeout(() => {
-                  navigate('/login', { replace: true, state: {} })
-                }, 150)
-              }} className="logout-button">
-                登出
-              </button>
-            )
-          ) : (
+          {user?.role === 'admin' && (
+            <button onClick={() => { 
+              logout()
+              setTimeout(() => {
+                navigate('/login', { replace: true, state: {} })
+              }, 150)
+            }} className="logout-button">
+              登出
+            </button>
+          )}
+          {!user && (
             <button onClick={() => navigate('/login', { state: {} })} className="login-button">
               登入
             </button>
