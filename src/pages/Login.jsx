@@ -16,25 +16,42 @@ function Login() {
   // Allow users to stay on login page even if logged in
   // Only redirect if they explicitly came from a protected route
   useEffect(() => {
-    // Only redirect if:
-    // 1. User is logged in AND
-    // 2. They came from a protected route (via location.state.from)
-    // 3. AND we're currently on the login page
+    // CRITICAL: Only redirect if user came from a protected route
+    // If user navigated directly to /login (no state.from), NEVER redirect
     // This allows users to manually navigate to /login to re-login or switch accounts
-    if (user && location.state?.from && location.pathname === '/login') {
+    
+    // Check if we have explicit from state (user came from protected route)
+    // location.state.from must exist AND be an object with pathname property
+    const hasFromState = location.state?.from && 
+                        typeof location.state.from === 'object' && 
+                        location.state.from.pathname
+    
+    // Only redirect if ALL conditions are met:
+    // 1. User is logged in
+    // 2. We have explicit from state (user came from protected route)
+    // 3. We're currently on login page
+    if (user && hasFromState && location.pathname === '/login') {
       const from = location.state.from.pathname || '/order'
       // Use setTimeout to prevent immediate redirect during initial load
       const timer = setTimeout(() => {
-        // Double-check we're still on login page and have from state before redirecting
-        if (window.location.pathname.includes('/login') && location.state?.from) {
+        // Final check: verify we're still on login page and have valid from state
+        const currentPath = window.location.pathname
+        const currentState = location.state
+        const stillHasFromState = currentState?.from && 
+                                  typeof currentState.from === 'object' && 
+                                  currentState.from.pathname
+        
+        if (currentPath.includes('/login') && stillHasFromState && user) {
           navigate(from, { replace: true, state: {} })
         }
-      }, 300)
+      }, 500)
       return () => clearTimeout(timer)
     }
+    
     // If user navigated directly to /login (no state.from), allow them to stay
     // This enables re-login and account switching
     // DO NOT redirect if user is logged in but came directly to /login
+    // This is the key fix: without location.state.from.pathname, we NEVER redirect
   }, [user, navigate, location])
 
   const handleSubmit = (e) => {

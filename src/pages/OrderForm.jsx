@@ -482,7 +482,7 @@ function OrderFormContent() {
             <div className="print-signature-row">
               <div className="print-signature-col">
                 <div className="print-signature-label">簽名：</div>
-                <div id="print-signature-content" style={{ borderTop: '0px', borderBottom: '1px solid #333', paddingBottom: '10px', minHeight: '40px', marginTop: '10px' }}></div>
+                <div id="print-signature-content" style={{ borderTop: '0px', paddingBottom: '10px', minHeight: '40px', marginTop: '10px' }}></div>
               </div>
               <div className="print-signature-col">
                 <div className="print-signature-label">日期：</div>
