@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
-import { clearCache } from '../utils/version'
 import '../styles/Login.css'
 import zxsLogo from '../img/ZXS logo.png'
 
@@ -38,12 +37,6 @@ function Login() {
   const handleDirectAccess = () => {
     directAccess()
     navigate('/order', { state: { directAccess: true } })
-  }
-
-  const handleClearCache = () => {
-    if (window.confirm('確定要清除網頁快取嗎？這將會重新載入頁面。')) {
-      clearCache()
-    }
   }
 
   return (
@@ -140,24 +133,6 @@ function Login() {
             whileTap={{ scale: 0.95 }}
           >
             員工直接進入
-          </motion.button>
-        </motion.div>
-
-        <motion.div
-          className="cache-clear-section"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.0 }}
-        >
-          <motion.button
-            type="button"
-            onClick={handleClearCache}
-            className="clear-cache-button"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            title="清除網頁快取"
-          >
-            🗑️ 清除快取
           </motion.button>
         </motion.div>
       </motion.div>
