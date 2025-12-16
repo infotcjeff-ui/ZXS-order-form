@@ -106,8 +106,8 @@ export function FieldProvider({ children }) {
           const sorted = Array.isArray(parsed) ? sortByLengthThenAlpha(parsed) : []
           setOrderTypes(sorted)
         } else {
-          // Default values
-          const defaults = ['標準訂單', '急件訂單', '批量訂單', '客製化訂單']
+          // Default values (seed with current set)
+          const defaults = ['車CAM', '電腦設備', '文具/物資', '其它']
           const sortedDefaults = sortByLengthThenAlpha(defaults)
           setOrderTypes(sortedDefaults)
           localStorage.setItem('orderTypes', JSON.stringify(sortedDefaults))
@@ -118,8 +118,16 @@ export function FieldProvider({ children }) {
           const sorted = Array.isArray(parsed) ? sortByLengthThenAlpha(parsed) : []
           setCompanies(sorted)
         } else {
-          // Default values
-          const defaults = ['中信方案有限公司', '合作夥伴A', '合作夥伴B']
+          // Default values (seed with current set)
+          const defaults = [
+            '金來',
+            '租車易',
+            '中信保險',
+            '貨車城集團',
+            '大中華汽車維修',
+            '中信方案有限公司',
+            '其它'
+          ]
           const sortedDefaults = sortByLengthThenAlpha(defaults)
           setCompanies(sortedDefaults)
           localStorage.setItem('companies', JSON.stringify(sortedDefaults))
@@ -127,8 +135,16 @@ export function FieldProvider({ children }) {
       } catch (e) {
         console.error('Error loading fields from localStorage:', e)
         // Set defaults on error
-        const orderDefaults = ['標準訂單', '急件訂單', '批量訂單', '客製化訂單']
-        const companyDefaults = ['中信方案有限公司', '合作夥伴A', '合作夥伴B']
+        const orderDefaults = ['車CAM', '電腦設備', '文具/物資', '其它']
+        const companyDefaults = [
+          '金來',
+          '租車易',
+          '中信保險',
+          '貨車城集團',
+          '大中華汽車維修',
+          '中信方案有限公司',
+          '其它'
+        ]
         const sortedOrderDefaults = sortByLengthThenAlpha(orderDefaults)
         const sortedCompanyDefaults = sortByLengthThenAlpha(companyDefaults)
         setOrderTypes(sortedOrderDefaults)
