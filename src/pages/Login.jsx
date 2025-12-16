@@ -19,17 +19,22 @@ function Login() {
     // Only redirect if:
     // 1. User is logged in AND
     // 2. They came from a protected route (via location.state.from)
+    // 3. AND we're currently on the login page
     // This allows users to manually navigate to /login to re-login or switch accounts
-    if (user && location.state?.from) {
+    if (user && location.state?.from && location.pathname === '/login') {
       const from = location.state.from.pathname || '/order'
-      // Use setTimeout to prevent immediate redirect
+      // Use setTimeout to prevent immediate redirect during initial load
       const timer = setTimeout(() => {
-        navigate(from, { replace: true })
-      }, 100)
+        // Double-check we're still on login page and have from state before redirecting
+        if (window.location.pathname.includes('/login') && location.state?.from) {
+          navigate(from, { replace: true, state: {} })
+        }
+      }, 300)
       return () => clearTimeout(timer)
     }
     // If user navigated directly to /login (no state.from), allow them to stay
     // This enables re-login and account switching
+    // DO NOT redirect if user is logged in but came directly to /login
   }, [user, navigate, location])
 
   const handleSubmit = (e) => {
