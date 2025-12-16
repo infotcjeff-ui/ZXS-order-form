@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react'
 import { copyFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
+// Allow dynamic base path for GitHub Pages (/ZXS-order-form/) vs Vercel (/).
+const base = process.env.VITE_APP_BASE || '/'
+
 export default defineConfig({
   plugins: [
     react(),
@@ -34,7 +37,7 @@ export default defineConfig({
       }
     }
   ],
-  base: '/ZXS-order-form/',
+  base,
   server: {
     port: 3000,
     open: true

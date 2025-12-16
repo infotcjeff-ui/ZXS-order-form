@@ -6,6 +6,8 @@ import AdminDashboard from './pages/AdminDashboard'
 import OrderForm from './pages/OrderForm'
 import ProtectedRoute from './components/ProtectedRoute'
 
+const BASENAME_ENV = import.meta.env.VITE_APP_BASE || '/'
+
 function RootRedirect() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
@@ -36,6 +38,30 @@ function AppRoutes() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // #region agent log
+  // Hypothesis A/B: Router basename or location mismatch on Vercel leading to blank screen.
+  useEffect(() => {
+    fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'B',
+        location: 'App.jsx:AppRoutes-location',
+        message: 'Route change observed',
+        data: {
+          pathname: location.pathname,
+          search: location.search,
+          hash: location.hash,
+          browserHref: window.location.href
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {})
+  }, [location])
+  // #endregion
 
   // Handle GitHub Pages 404 redirect - clean up URL if needed
   useEffect(() => {
@@ -97,9 +123,31 @@ function AppRoutes() {
 }
 
 function App() {
+  // #region agent log
+  // Hypothesis C: BrowserRouter basename may be incompatible with Vercel root hosting.
+  useEffect(() => {
+    fetch('http://127.0.0.1:7243/ingest/0140afbe-99e5-41b8-a6ec-03a8d100c650', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'C',
+        location: 'App.jsx:App-basename',
+        message: 'Router basename check',
+        data: {
+          basename: BASENAME_ENV,
+          href: window.location.href
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {})
+  }, [])
+  // #endregion
+
   return (
     <AuthProvider>
-      <Router basename="/ZXS-order-form">
+      <Router basename={BASENAME_ENV === '/' ? undefined : BASENAME_ENV}>
         <AppRoutes />
       </Router>
     </AuthProvider>
