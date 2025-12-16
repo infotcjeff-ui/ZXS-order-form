@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '../utils/supabaseClient'
 
 const FieldContext = createContext()
 
 export function FieldProvider({ children }) {
   const [orderTypes, setOrderTypes] = useState([])
   const [companies, setCompanies] = useState([])
+
+  const FIELD_TABLE = 'field_sets'
 
   const sortByLengthThenAlpha = (arr) =>
     [...arr].sort((a, b) => {
@@ -14,9 +17,33 @@ export function FieldProvider({ children }) {
       return (a || '').localeCompare(b || '', 'zh-Hant')
     })
 
+  const persistFieldSet = async (name, items) => {
+    if (!supabase) return
+    const { error } = await supabase
+      .from(FIELD_TABLE)
+      .upsert({ name, items }, { onConflict: 'name' })
+    if (error) {
+      console.error(`Failed to persist ${name} to Supabase`, error)
+    }
+  }
+
+  const fetchFieldSet = async (name) => {
+    if (!supabase) return null
+    const { data, error } = await supabase
+      .from(FIELD_TABLE)
+      .select('items')
+      .eq('name', name)
+      .maybeSingle()
+    if (error) {
+      console.error(`Failed to fetch ${name} from Supabase`, error)
+      return null
+    }
+    return data?.items || null
+  }
+
   useEffect(() => {
     // Load from localStorage
-    const loadFields = () => {
+    const loadFields = async () => {
       try {
         const savedOrderTypes = localStorage.getItem('orderTypes')
         const savedCompanies = localStorage.getItem('companies')
@@ -56,6 +83,37 @@ export function FieldProvider({ children }) {
         localStorage.setItem('orderTypes', JSON.stringify(sortedOrderDefaults))
         localStorage.setItem('companies', JSON.stringify(sortedCompanyDefaults))
       }
+
+      // Try to hydrate from Supabase if configured
+      if (supabase) {
+        try {
+          const [remoteOrderTypes, remoteCompanies] = await Promise.all([
+            fetchFieldSet('orderTypes'),
+            fetchFieldSet('companies')
+          ])
+
+          if (remoteOrderTypes && Array.isArray(remoteOrderTypes)) {
+            const sorted = sortByLengthThenAlpha(remoteOrderTypes)
+            setOrderTypes(sorted)
+            localStorage.setItem('orderTypes', JSON.stringify(sorted))
+          } else if (!savedOrderTypes) {
+            // seed Supabase with defaults if nothing existed
+            const defaults = JSON.parse(localStorage.getItem('orderTypes') || '[]')
+            await persistFieldSet('orderTypes', defaults)
+          }
+
+          if (remoteCompanies && Array.isArray(remoteCompanies)) {
+            const sorted = sortByLengthThenAlpha(remoteCompanies)
+            setCompanies(sorted)
+            localStorage.setItem('companies', JSON.stringify(sorted))
+          } else if (!savedCompanies) {
+            const defaults = JSON.parse(localStorage.getItem('companies') || '[]')
+            await persistFieldSet('companies', defaults)
+          }
+        } catch (err) {
+          console.error('Error syncing fields with Supabase:', err)
+        }
+      }
     }
     
     loadFields()
@@ -75,12 +133,14 @@ export function FieldProvider({ children }) {
     const updated = sortByLengthThenAlpha([...orderTypes, value])
     setOrderTypes(updated)
     localStorage.setItem('orderTypes', JSON.stringify(updated))
+    persistFieldSet('orderTypes', updated)
   }
 
   const deleteOrderType = (index) => {
     const updated = sortByLengthThenAlpha(orderTypes.filter((_, i) => i !== index))
     setOrderTypes(updated)
     localStorage.setItem('orderTypes', JSON.stringify(updated))
+    persistFieldSet('orderTypes', updated)
   }
 
   const updateOrderType = (index, value) => {
@@ -89,27 +149,30 @@ export function FieldProvider({ children }) {
     )
     setOrderTypes(updated)
     localStorage.setItem('orderTypes', JSON.stringify(updated))
+    persistFieldSet('orderTypes', updated)
   }
 
   const addCompany = (value) => {
     const updated = sortByLengthThenAlpha([...companies, value])
     setCompanies(updated)
     localStorage.setItem('companies', JSON.stringify(updated))
+    persistFieldSet('companies', updated)
   }
 
   const deleteCompany = (index) => {
     const updated = sortByLengthThenAlpha(companies.filter((_, i) => i !== index))
     setCompanies(updated)
     localStorage.setItem('companies', JSON.stringify(updated))
+    persistFieldSet('companies', updated)
   }
 
   const updateCompany = (index, value) => {
     const updated = sortByLengthThenAlpha(
       companies.map((item, i) => (i === index ? value : item))
     )
-    updated[index] = value
     setCompanies(updated)
     localStorage.setItem('companies', JSON.stringify(updated))
+    persistFieldSet('companies', updated)
   }
 
   const value = {

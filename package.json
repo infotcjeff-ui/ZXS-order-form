@@ -10,14 +10,15 @@
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.87.3",
+    "docx": "^8.2.2",
+    "file-saver": "^2.0.5",
+    "framer-motion": "^10.16.16",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "framer-motion": "^10.16.16",
-    "jspdf": "^2.5.1",
-    "html2canvas": "^1.4.1",
-    "docx": "^8.2.2",
-    "file-saver": "^2.0.5"
+    "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -26,4 +27,3 @@
     "vite": "^5.0.8"
   }
 }
-
